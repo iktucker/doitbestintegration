@@ -2,7 +2,7 @@
 
 ## About
 
-This is a module for Thirybees (Prestashop?) that integrates the inventory count API and EDI files from Do It Best's dataxchange platform to allow your shop to automatically update itself at set times.
+This is a module for Thirtybees (Prestashop?) that integrates the inventory count API and EDI files from Do It Best's dataxchange platform to allow your shop to automatically update itself at set times.
 
 ## Usage
 
