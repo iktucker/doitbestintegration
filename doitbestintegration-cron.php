@@ -336,7 +336,7 @@ function do_pricing_refresh() {
     $db = \Db::getInstance();
     foreach ($result as $index => $product) {
         if ($product -> RSCNumeric == $warehouseNumber) {
-            $query = 'UPDATE ' . _DB_PREFIX_ . 'product SET price = ' . $product -> suggestedRetailPrice . ' WHERE id_product = (SELECT id_product FROM ' . _DB_PREFIX_ . 'product WHERE reference="' . $product->sku . '" LIMIT 1)';
+            $query = 'UPDATE ' . _DB_PREFIX_ . 'product_shop SET price = ' . $product -> suggestedRetailPrice . ' WHERE id_product = (SELECT id_product FROM ' . _DB_PREFIX_ . 'product WHERE reference="' . $product->sku . '" LIMIT 1)';
             $db->execute($query);
             continue;
         }
