@@ -74,6 +74,27 @@
             </div>
         </div>
         <div class="form-group clearfix" style="border: 1px solid grey; display: flex; align-items: center; padding: 10px; border-radius: 10px;">
+            <label class="col-lg-3 col-xs-5">API Pricing Refresh:<br><small>Updates the quantity values at the selected interval. Requires the cron job be properly configured.</small></label>
+            <div class="col-lg-5 col-xs-7 text-center">
+                <div class="col-lg-8">
+                    <input type="radio" id="dib_pricing_refresh_disable" name="dib_pricing_refresh" value="0" {if $doItBestConfig.dib_pricing_refresh === '0'} checked {/if}>
+                    <label for="dib_pricing_refresh_disable">Disable</label>
+                    <input type="radio" id="dib_pricing_refresh_enable" name="dib_pricing_refresh" value="1" style="margin-left: 15px;" {if $doItBestConfig.dib_pricing_refresh === '1'} checked {/if}>
+                    <label for="dib_pricing_refresh_enable">Enable</label>
+                </div>
+                <div class="col-lg-8" style="align-content: center;">
+                    <select name="dib_pricing_refresh_interval" class="col-xs-12 col-lg-6 col-lg-offset-3">
+                        <option value="5" {if $doItBestConfig.dib_pricing_refresh_interval == 5} selected {/if}>Interval: 5 Minutes</option>
+                        <option value="hourly" {if $doItBestConfig.dib_pricing_refresh_interval == 'hourly'} selected {/if}>Interval: 60 Minutes</option>
+                        <option value="daily" {if $doItBestConfig.dib_pricing_refresh_interval == 'daily'} selected {/if}>Interval: 1 Day</option>
+                    </select>
+                </div>
+                <div class="col-lg-2">
+                    <button type="button" class="btn btn-info" onclick="change_location('pricingRefresh')">Test this Method</button>
+                </div>
+            </div>
+        </div>
+        <div class="form-group clearfix" style="border: 1px solid grey; display: flex; align-items: center; padding: 10px; border-radius: 10px;">
             <label class="col-lg-3 col-xs-5">EDI Product Adds:<br><small>Uses the TLS FTP server to get product info, images, quantities, etc. EDI files are often >300MB. Be sure you have enough space on the server.</small></label>
             <div class="col-lg-5 col-xs-7 text-center">
                 <div class="col-lg-8">

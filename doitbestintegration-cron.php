@@ -86,7 +86,41 @@ function execute_scheduled_tasks()
                             echo json_encode($message);
                         }
                     }
-                    break;     
+                    break;   
+                    
+                    case 'DOITBEST_STOCK_REFRESH_INTERVAL':
+                    if (is_time_to_run(Configuration::get('DOITBEST_STOCK_REFRESH_INTERVAL')) && Configuration::get('DOITBEST_STOCK_REFRESH') == 1) {
+                        if (!$result = do_stock_refresh()) {
+                            error_log('Failed performing stock refresh in doitbestintegration module');
+                            header('Content-Type: application/json');
+                            $message = ['message' => 'Failed performing stock refresh in doitbestintegration module'];
+                            echo json_encode($message);
+                        }
+                        else {
+                            error_log('Success. ' . $result->count . ' products were refreshed.');
+                            header('Content-Type: application/json');
+                            $message = ['message' => 'Success. ' . $result->count . ' products were refreshed.', 'data' => ($result->data)];
+                            echo json_encode($message);
+                        }
+                    }
+                    break; 
+
+                    case 'DOITBEST_PRICING_REFRESH_INTERVAL':
+                    if (is_time_to_run(Configuration::get('DOITBEST_PRICING_REFRESH_INTERVAL')) && Configuration::get('DOITBEST_PRICING_REFRESH') == 1) {
+                        if (!$result = do_pricing_refresh()) {
+                            error_log('Failed performing pricing refresh in doitbestintegration module');
+                            header('Content-Type: application/json');
+                            $message = ['message' => 'Failed performing pricing refresh in doitbestintegration module'];
+                            echo json_encode($message);
+                        }
+                        else {
+                            error_log('Success. ' . $result->count . ' products were refreshed.');
+                            header('Content-Type: application/json');
+                            $message = ['message' => 'Success. ' . $result->count . ' products were refreshed.', 'data' => ($result->data)];
+                            echo json_encode($message);
+                        }
+                    }
+                    break; 
 
                 case 'DOITBEST_STOCK_ADD_INTERVAL':
                     if (is_time_to_run(Configuration::get('DOITBEST_STOCK_ADD_INTERVAL')) && Configuration::get('DOITBEST_STOCK_ADD_EDI') == 1) {
@@ -264,7 +298,7 @@ function do_edi_add_and_update () {
 }
 
 // Make use of the DataXChange Item Cost Updates endpoint to get pricing updates
-function do_pricing_update() {
+function do_pricing_refresh() {
     $apiKey = Configuration::get('DOITBEST_API_KEY');
     $storeNumber = Configuration::get('DOITBEST_STORE_NUMBER');
     $warehouseNumber = Configuration::get('DOITBEST_WAREHOUSE_NUMBER');
