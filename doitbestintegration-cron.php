@@ -263,6 +263,59 @@ function do_edi_add_and_update () {
     return $result;
 }
 
+// Make use of the DataXChange Item Cost Updates endpoint to get pricing updates
+function do_pricing_update() {
+    $apiKey = Configuration::get('DOITBEST_API_KEY');
+    $storeNumber = Configuration::get('DOITBEST_STORE_NUMBER');
+    $warehouseNumber = Configuration::get('DOITBEST_WAREHOUSE_NUMBER');
+    $stockRefreshTime = date("Y-m-d H:i:s.000", (strtotime(gmdate("Y-m-d H:i:s")) - (Configuration::get('DOITBEST_STOCK_REFRESH_INTERVAL') * 60)));
+
+    $endpointUrl = 'https://api.doitbestdataxchange.com/cost/itemcostchanges?' . http_build_query(array(
+            'memberNumber' => $storeNumber,
+            'changesSince' => $stockRefreshTime
+        )
+    );
+
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_URL, $endpointUrl);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+        "Ocp-Apim-Subscription-Key: $apiKey"
+    ));
+
+    if (($result = curl_exec($curl)) === false) {
+        curl_close($curl);
+        return FALSE;
+    }
+
+    curl_close($curl);
+
+    // Parse response
+    $result = json_decode($result);
+
+    // If nothing is updated, a message "There are no changes since the provided date" is returned which won't be parsed by json decode
+    if (is_null($result)) {
+        return (object) ['data' => null, 'count' => 0];
+    }
+
+    // If this function returns results, update quantities by modifying SQL
+    $db = \Db::getInstance();
+    foreach ($result as $index => $product) {
+        if ($product -> RSCNumeric == $warehouseNumber) {
+            $query = 'UPDATE ' . _DB_PREFIX_ . 'product SET price = ' . $product -> suggestedRetailPrice . ' WHERE id_product = (SELECT id_product FROM ' . _DB_PREFIX_ . 'product WHERE reference="' . $product->sku . '" LIMIT 1)';
+            $db->execute($query);
+            continue;
+        }
+
+        // Remove items not stock in your warehouse form showing the results of this script in browser/curl
+        unset($result[$index]);
+    }
+
+    $result = (object) ['data' => $result, 'count' => count($result)];
+
+    return $result;
+}
+
 execute_scheduled_tasks();
 
 // Clean up console output
