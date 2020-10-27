@@ -95,6 +95,20 @@ class DoItBestIntegration extends Module
             'required' => FALSE
         ),
         array(
+            'form_key' => 'dib_pricing_refresh',
+            'config_key' => 'DOITBEST_STOCK_REFRESH',
+            'type' => 'radio',
+            'depends' => null,
+            'required' => FALSE
+        ),
+        array(
+            'form_key' => 'dib_pricing_refresh_interval',
+            'config_key' => 'DOITBEST_PRICING_REFRESH_INTERVAL',
+            'type' => 'select',
+            'depends' => 'dib_pricing_refresh',
+            'required' => FALSE
+        ),
+        array(
             'form_key' => 'dib_stock_add_edi',
             'config_key' => 'DOITBEST_STOCK_ADD_EDI',
             'type' => 'radio',
