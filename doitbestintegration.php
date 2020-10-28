@@ -141,6 +141,10 @@ class DoItBestIntegration extends Module
                 case 'stockRefresh':
                     $this->context->smarty->assign('testData', $this->do_stock_refresh());
                     break;
+
+                case 'pricingRefresh':
+                    $this->context->smarty->assign('testData', $this->do_stock_refresh());
+                    break;
                 
                 default:
                     break;
@@ -214,6 +218,38 @@ class DoItBestIntegration extends Module
             "Ocp-Apim-Subscription-Key: $apiKey"
         ));
 
+
+        $result = curl_exec($curl);
+        curl_close($curl);
+
+        return $result;
+        json_encode(array("refreshDate" => $stockRefreshTime, "store" => $storeNumber, "result" => json_decode($result)), JSON_PRETTY_PRINT);
+    }
+
+    public function do_pricing_refresh() {
+        $apiKey = Configuration::get('DOITBEST_API_KEY');
+        $storeNumber = Configuration::get('DOITBEST_STORE_NUMBER');
+        $stockRefreshTime = date("Y-m-d H:i:s.000", (strtotime(gmdate("Y-m-d H:i:s")) - (Configuration::get('DOITBEST_STOCK_REFRESH_INTERVAL') * 60)));
+
+        $endpointUrl = 'https://api.doitbestdataxchange.com/cost/itemcostchanges?' . http_build_query(array(
+            'memberNumber' => $storeNumber,
+            'changesSince' => $stockRefreshTime
+        )
+        );
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $endpointUrl);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+            "Ocp-Apim-Subscription-Key: $apiKey"
+        ));
+
+        if (($result = curl_exec($curl)) === false) {
+            curl_close($curl);
+            return FALSE;
+        }
+
+        curl_close($curl);
 
         $result = curl_exec($curl);
         curl_close($curl);
